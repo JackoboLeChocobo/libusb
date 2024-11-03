@@ -543,8 +543,13 @@ static int windows_assign_endpoints(struct libusb_device_handle *dev_handle, uin
 
 	if_desc = get_interface_descriptor_by_number(dev_handle, conf_desc, iface, altsetting);
 	if (if_desc == NULL) {
-		r = LIBUSB_ERROR_NOT_FOUND;
-		goto end;
+		//Trying with 1.0.26 method
+		if (iface >= conf_desc->bNumInterfaces) {
+			usbi_err(HANDLE_CTX(dev_handle), "interface %d out of range for device", iface);
+			r = LIBUSB_ERROR_NOT_FOUND;
+			goto end;
+			}
+		if_desc = &conf_desc->interface[iface].altsetting[altsetting];
 	}
 
 	safe_free(priv->usb_interface[iface].endpoint);
